@@ -1,11 +1,8 @@
 import streamlit as st
 from joblib import load
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
+import re
 import string
 from sklearn.feature_extraction.text import TfidfVectorizer
-
 
 # Загрузка модели из файла
 model = load('sentiment_classifier.joblib')
@@ -24,18 +21,11 @@ def preprocess_text(text):
     text = text.lower()
     # Удаление пунктуации
     text = text.translate(str.maketrans('', '', string.punctuation))
-    # Токенизация
-    tokens = word_tokenize(text)
-    # Удаление стоп-слов
-    stop_words = set(stopwords.words('russian'))
-    filtered_tokens = [word for word in tokens if word not in stop_words]
-    # Лемматизация
-    lemmatizer = WordNetLemmatizer()
-    lemmatized_tokens = [lemmatizer.lemmatize(word) for word in filtered_tokens]
+    # Простая токенизация с использованием регулярного выражения
+    tokens = re.findall(r'\b\w+\b', text)
     # Склеивание токенов обратно в текст
-    preprocessed_text = ' '.join(lemmatized_tokens)
+    preprocessed_text = ' '.join(tokens)
     return preprocessed_text
-
 
 # Кнопка для запуска предсказания
 if st.button("Предсказать"):
